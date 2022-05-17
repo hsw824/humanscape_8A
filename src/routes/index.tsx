@@ -5,7 +5,7 @@ import styles from './Routes.module.scss'
 import { useAppSelector } from 'hooks'
 import { getTheme } from 'states/system'
 
-import Search from 'routes/Search'
+import Search from 'routes/Search/index'
 
 const App = () => {
   const theme = useAppSelector(getTheme)

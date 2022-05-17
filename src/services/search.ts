@@ -1,33 +1,26 @@
 import { axios } from 'hooks/worker'
+import { useState } from 'react'
 import { ISearchApiRes } from '../types/search.d'
 
-const SEARCH_BASE_URL =
-  'https://cors-anywhere.herokuapp.com/http://apis.data.go.kr/B551182/diseaseInfoService/getDissNameCodeList'
+const SEARCH_BASE_URL = '/B551182/diseaseInfoService/getDissNameCodeList'
+const API_KEY = process.env.REACT_APP_DISEASE_API_KEY
 
 const getDiseasesNameOptions = {
   // ServiceKey: process.env.REACT_APP_DISEASE_API_KEY,
-  ServiceKey: 'Xokhems/S69u//piF4ZQXzwejXPmBzwpCxSILxtlvih7xZsRFF+D9I7bH/8YOwQasNN6UojUbb8cjysk7BSgLw==',
+  ServiceKey: API_KEY,
   pageNo: 1,
-  sickType: 2,
+  sickType: 1,
   medTp: 2,
   diseaseType: 'SICK_NM',
   _type: 'json',
 }
 
-export const getDiseasesName = (searchText: string) =>
-  axios.get<ISearchApiRes>(SEARCH_BASE_URL, {
+export const getDiseasesName = async (searchText: string) => {
+  return axios.get<ISearchApiRes>(SEARCH_BASE_URL, {
     params: {
       searchText,
       ...getDiseasesNameOptions,
     },
+    timeout: 30000,
   })
-// .then((res: any) => console.log('res', res))
-// .catch((res: any) => console.log('err', res))
-
-// export const getDiseasesName = (searchText: string) =>
-// axios.get<ISearchApiRes>(SEARCHBAR_BASE_URL, {
-//   params: {
-//     searchText,
-//     ...getDiseasesNameOptions,
-//   },
-// })
+}
