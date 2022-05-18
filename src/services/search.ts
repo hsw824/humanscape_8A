@@ -1,5 +1,4 @@
-import { axios } from 'hooks/worker'
-import { useState } from 'react'
+import axios, { Canceler, CancelTokenSource } from 'axios'
 import { ISearchApiRes } from '../types/search.d'
 
 const SEARCH_BASE_URL = '/B551182/diseaseInfoService/getDissNameCodeList'
@@ -15,12 +14,16 @@ const getDiseasesNameOptions = {
   _type: 'json',
 }
 
-export const getDiseasesName = async (searchText: string) => {
+let call: CancelTokenSource
+export const getDiseasesName = (searchText: string) => {
+  if (call) call.cancel()
+  call = axios.CancelToken.source()
   return axios.get<ISearchApiRes>(SEARCH_BASE_URL, {
+    cancelToken: call.token,
     params: {
       searchText,
       ...getDiseasesNameOptions,
     },
-    timeout: 30000,
+    timeout: 5000,
   })
 }
