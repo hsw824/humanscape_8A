@@ -8,7 +8,6 @@ import { getDiseasesName } from 'services/search'
 import { setItems } from 'states/search'
 import { getHasResult, setHasResult } from 'states/searchHasResult'
 import axios from 'axios'
-import { IItem } from 'types/search'
 
 const SearchList = React.lazy(() => import('./SearchList'))
 
