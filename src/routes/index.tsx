@@ -8,12 +8,6 @@ import { getTheme } from 'states/system'
 import Search from 'routes/Search'
 
 const App = () => {
-  const theme = useAppSelector(getTheme)
-
-  useMount(() => {
-    document.documentElement.setAttribute('color-theme', theme)
-  })
-
   return (
     <div className={styles.appWrapper}>
       <div className={styles.app}>

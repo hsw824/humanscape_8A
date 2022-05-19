@@ -1,6 +1,10 @@
 @use '/src/styles/constants/colors';
 @use '/src/styles/mixins/responsive';
 
+.active {
+  background-color: colors.$GRAYE;
+}
+
 .searchContainer {
   width: 100vw;
   height: 100vh;
@@ -75,6 +79,10 @@
   }
 }
 
+.highlight {
+  font-weight: bold;
+  color: colors.$BLUE;
+}
 // ---------------------------------------------------------------
 // 웹 뷰 기준 (나중에 주석 지우기)
 @include responsive.after(MD) {

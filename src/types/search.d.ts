@@ -1,5 +1,5 @@
 export interface ISearchApiRes {
-  response: Response
+  response: IResponse
 }
 
 export interface IResponse {
