@@ -1,4 +1,4 @@
-import axios, { Canceler, CancelTokenSource } from 'axios'
+import axios, { CancelTokenSource } from 'axios'
 import { ISearchApiRes } from '../types/search.d'
 
 const SEARCH_BASE_URL = '/B551182/diseaseInfoService/getDissNameCodeList'
@@ -24,6 +24,6 @@ export const getDiseasesName = (searchText: string) => {
       searchText,
       ...getDiseasesNameOptions,
     },
-    timeout: 5000,
+    timeout: 10000,
   })
 }
