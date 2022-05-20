@@ -17,6 +17,7 @@ let call: CancelTokenSource
 export const getDiseasesName = (searchText: string) => {
   if (call) call.cancel()
   call = axios.CancelToken.source()
+  console.log('호출되었습니다')
   return axios
     .get<ISearchApiRes>(SEARCH_BASE_URL, {
       cancelToken: call.token,
@@ -26,5 +27,16 @@ export const getDiseasesName = (searchText: string) => {
       },
       timeout: 10000,
     })
-    .then((res) => res.data.response.body.items.item)
+    .then((res) => {
+      const result = res?.data.response.body.items.item
+      if (!result) return { data: [], call }
+      if (Array.isArray(result)) return { data: result, call }
+      if (typeof result === 'object') return { data: [result], call }
+      return { data: result, call }
+    })
+    .catch(function (thrown) {
+      if (axios.isCancel(thrown)) {
+        console.log(`%c Request ${thrown.message}`, 'background: #bd71ff; color:#eaeaea')
+      }
+    })
 }

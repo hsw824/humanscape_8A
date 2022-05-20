@@ -14,7 +14,7 @@ const INITIAL_STATE: DiseaseState = {
 }
 
 const diseaseSlice = createSlice({
-  name: 'disease',
+  name: 'search',
   initialState: INITIAL_STATE,
   reducers: {
     setDiseaseList: (state: DiseaseState, action: PayloadAction<IItem[]>) => {
@@ -32,5 +32,5 @@ export default diseaseSlice.reducer
 
 // Selector =====================
 
-export const getDiseaseList = (state: RootState): IItem[] => state.disease.diseaseList
-export const getDebouncedText = (state: RootState): string => state.disease.debouncedText
+export const getDiseaseList = (state: RootState): IItem[] => state.search.diseaseList
+export const getDebouncedText = (state: RootState): string => state.search.debouncedText

@@ -1,18 +1,17 @@
 import { useEffect, useAppDispatch } from 'hooks'
 import { setDebouncedText } from 'states/search'
+import { CancelTokenSource } from 'axios'
 
 export const useQueryDebounce = (value: string, delay = 600) => {
-  const replacedValue = value.replaceAll(' ', '')
   const dispatch = useAppDispatch()
   useEffect(() => {
     const handler: NodeJS.Timeout = setTimeout(() => {
       // eslint-disable-next-line no-console
-      console.log('호출되었습니다')
-      dispatch(setDebouncedText(replacedValue))
+      dispatch(setDebouncedText(value))
     }, delay)
 
     return () => {
       clearTimeout(handler)
     }
-  }, [value, delay, dispatch, replacedValue])
+  }, [value, delay, dispatch])
 }

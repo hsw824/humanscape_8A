@@ -3,39 +3,35 @@ import { useQuery } from 'react-query'
 import { useState, useEffect, useRef, useMemo, useAppSelector, useAppDispatch, useQueryDebounce } from 'hooks'
 import axios from 'axios'
 import { getDiseasesName } from 'services/search'
-import { setDiseaseList, getDebouncedText, setDebouncedText } from 'states/search'
 import classNames from 'classnames'
 import { SearchIcon } from 'assets/svgs'
 
 import styles from './Search.module.scss'
-import List from './List'
 
 const Search = () => {
-  const debouncedSearchText = useAppSelector((state) => state.disease.debouncedText)
+  const debouncedSearchText = useAppSelector((state) => state.search.debouncedText)
 
   const [searchText, setSearchText] = useState('')
-  const [isEmptyResponse, setIsEmptyResponse] = useState(false)
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(-2)
+  const [isEmptyResponse, setIsEmptyResponse] = useState<boolean>(false)
 
   const ref = useRef<HTMLInputElement>(null)
 
-  useQueryDebounce(searchText)
+  useQueryDebounce(searchText.replaceAll(' ', ''))
 
   const { data, isLoading } = useQuery(
     ['diseaseList', debouncedSearchText],
-    () =>
-      getDiseasesName(debouncedSearchText).catch(function (thrown) {
-        if (axios.isCancel(thrown)) {
-          throw new Error(thrown)
-        }
-      }),
-
+    () => {
+      if (debouncedSearchText === '') return undefined
+      return getDiseasesName(debouncedSearchText)
+    },
     {
       onSuccess: (successData) => {
-        if (successData) {
-          setIsEmptyResponse(false)
-        } else {
+        console.log(successData)
+        if (successData?.data.length === 0) {
           setIsEmptyResponse(true)
+        } else {
+          setIsEmptyResponse(false)
         }
       },
       enabled: !!debouncedSearchText,
@@ -43,6 +39,16 @@ const Search = () => {
       staleTime: 1000 * 60 * 5,
     }
   )
+  useEffect(() => {
+    console.log(index)
+  }, [])
+
+  useEffect(() => {
+    if (data?.call) {
+      console.log('hi')
+      data.call.cancel('취소')
+    }
+  }, [searchText])
 
   const handleChangeSearchText = (evt: ChangeEvent<HTMLInputElement>) => {
     const { value } = evt.currentTarget
@@ -50,38 +56,54 @@ const Search = () => {
   }
 
   const handleKeyMove = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (!data) return
+    if (!data?.data) return
+    console.log(event.currentTarget.value)
+    console.log(index)
 
     if (event.key === 'ArrowUp' && index > 0) {
       setIndex((prev) => prev - 1)
     } else if (event.key === 'ArrowUp' && index === 0) {
-      setIndex(data.length - 1)
+      setIndex(data.data.length - 1)
     }
-
-    if (event.key === 'ArrowDown' && index < data.length - 1) {
+    console.log()
+    if (event.key === 'ArrowDown' && index < data.data.length - 1) {
+      console.log(index)
       setIndex((prev) => prev + 1)
-    } else if (event.key === 'ArrowDown' && index === data.length - 1) {
+    } else if (event.key === 'ArrowDown' && index === data.data.length - 1) {
+      console.log('hi')
       setIndex(0)
     }
   }
 
   useEffect(() => {
-    setIndex(-1)
+    setIndex(-2)
   }, [searchText])
 
   const itemList = useMemo(
     () =>
-      data?.map(({ sickCd, sickNm }, i) => (
-        <li className={classNames({ [styles.active]: i === index })} key={sickCd}>
-          <button type='button'>
-            {sickNm.split(debouncedSearchText)[0]}
-            <b className={styles.highlight}>{debouncedSearchText}</b>
-            {sickNm.split(debouncedSearchText)[1]}
-          </button>
-        </li>
-      )),
+      data?.data.map(({ sickCd, sickNm }, i) => {
+        console.log(sickNm, i)
+        return (
+          <li className={classNames({ [styles.active]: i === index })} key={sickCd}>
+            <button type='button'>
+              {sickNm.split(debouncedSearchText)[0]}
+              <b className={styles.highlight}>{debouncedSearchText}</b>
+              {sickNm.split(debouncedSearchText)[1]}
+            </button>
+          </li>
+        )
+      }),
     [data, debouncedSearchText, index]
   )
+
+  const resultMessage = useMemo(() => {
+    console.log(isEmptyResponse, isLoading)
+    return isEmptyResponse ? '검색 결과가 없습니다' : '추천 검색어'
+  }, [isEmptyResponse])
+
+  const onClick = () => {
+    console.log(index)
+  }
 
   return (
     <div className={styles.searchContainer}>
@@ -95,6 +117,7 @@ const Search = () => {
         <input
           className={styles.searchInput}
           value={searchText}
+          onClick={onClick}
           onChange={handleChangeSearchText}
           placeholder='질환명을 입력해 주세요.'
           ref={ref}
@@ -107,9 +130,8 @@ const Search = () => {
 
       {debouncedSearchText && (
         <ul className={styles.dropdown}>
-          <li>추천 검색어</li>
-          {isLoading && <li>Loading...</li>}
-          {!isLoading && isEmptyResponse && !data && <li>검색어가 없습니다.</li>}
+          {isLoading && <p>Loading...</p>}
+          <span>{!isLoading && resultMessage}</span>
           {itemList}
         </ul>
       )}

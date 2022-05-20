@@ -10,7 +10,7 @@ interface Props {
 }
 
 const List = ({ index, data, isRender }: Props): JSX.Element | null => {
-  const debouncedSearchText = useAppSelector((state) => state.disease.debouncedText)
+  const debouncedSearchText = useAppSelector((state) => state.search.debouncedText)
 
   if (!isRender) {
     return null
